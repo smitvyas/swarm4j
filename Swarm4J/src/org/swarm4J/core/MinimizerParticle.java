@@ -16,13 +16,31 @@ public class MinimizerParticle extends AbstractParticle{
 
     public MinimizerParticle(Swarm swarm, ICostFunction costFunction, int dimensions,int numberOfInformants) {
         super(swarm,costFunction,dimensions,numberOfInformants);
+        this.optimizedResult = Double.POSITIVE_INFINITY;
     }
 
     @Override
-    public void evaluatePosition() throws Exception{
-         if (this.costFunction.evaluate(this.position) < this.optimizedResult) {
+    public void evaluatePosition() throws Exception {
+        double r = this.costFunction.evaluate(this.position);
+        this.result = r;
+        if (r < this.optimizedResult ) {
             this.bestPosition = this.position;
+            this.optimizedResult = r;
         }
+    }
+
+    @Override
+    protected void selectBestInformantPosition() {
+        double best = this.informants.get(0).getResult();
+        int index = 0;
+        for(int i = 0; i < this.informants.size(); i++) {
+            AbstractParticle p = this.informants.get(i);
+            if (p.getResult() < best) {
+                best = p.getResult();
+                index = i;
+            }
+        }
+        this.bestInformantPosition = this.informants.get(index).getPosition();
     }
 
 }

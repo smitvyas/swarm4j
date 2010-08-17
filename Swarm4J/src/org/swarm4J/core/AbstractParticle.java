@@ -15,6 +15,8 @@ public abstract class AbstractParticle {
 
     private int dimensions;
 
+    protected double result;
+
     protected double optimizedResult;
 
     private Swarm swarm;
@@ -22,7 +24,7 @@ public abstract class AbstractParticle {
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.A82FFD68-DA8C-3320-D191-85146A0A25BC]
     // </editor-fold> 
-    private List<AbstractParticle> informants;
+    protected List<AbstractParticle> informants;
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.3B866CF8-FF0E-06B7-A0F5-D33D2BE0D38E]
@@ -42,7 +44,7 @@ public abstract class AbstractParticle {
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.E880B3B0-A05B-6A3C-354C-5CDEE3FBC703]
     // </editor-fold> 
-    private List<Double> bestInformantPosition;
+    protected List<Double> bestInformantPosition;
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.9775AFBF-F3A3-4B67-CDE7-A4EBEBF9E0F9]
@@ -58,6 +60,7 @@ public abstract class AbstractParticle {
     // #[regen=yes,id=DCE.A825C29E-3181-35D5-1C29-83B320A08A49]
     // </editor-fold> 
     private double maxConfidence;
+    private final int numberOfInformants;
 
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
@@ -68,10 +71,13 @@ public abstract class AbstractParticle {
         this.maxConfidence = 1.47;
         this.swarm = swarm;
         this.costFunction = costFunction;
+        this.dimensions = dimensions;
         this.position = new ArrayList<Double>(dimensions);
         this.velocity = new ArrayList<Double>(dimensions);
         this.bestPosition = new ArrayList<Double>(dimensions);
         this.informants = new ArrayList<AbstractParticle>(numberOfInformants);
+        this.numberOfInformants = numberOfInformants;
+        //this.optimizedResult = Double.NaN;
 
     }
 
@@ -140,37 +146,35 @@ public abstract class AbstractParticle {
         return optimizedResult;
     }
 
-    
-    private void selectBestInformantPosition() {
-        double best = this.informants.get(0).getOptimizedResult();
-        int index = 0;
-        for(int i = 0; i < this.informants.size(); i++) {
-            AbstractParticle p = this.informants.get(i);
-            if (p.getOptimizedResult() > best) {
-                best = p.getOptimizedResult();
-                index = i;
-            }
-        }
-        this.bestInformantPosition = this.informants.get(index).getBestPosition();
+    public double getResult() {
+        return result;
     }
+
+    
+    protected abstract void selectBestInformantPosition();
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.E622AE27-621B-F0B1-FA8A-48589764685B]
     // </editor-fold> 
     public void move() {
+        double newVelocity;
+        double newPosition;
         this.selectInformants();
         this.selectBestInformantPosition();
+        MersenneTwisterFast mt = Utils.getMTInstance();
         for (int i = 0; i < this.dimensions; i++) {
-            double newVelocity = selfConfidence*this.velocity.get(i) + this.maxConfidence*Utils.getMTRandom()*(this.bestPosition.get(i)-this.position.get(i)) +
-                    this.maxConfidence*Utils.getMTRandom()*(this.bestInformantPosition.get(i)-this.position.get(i));
-            double newPosition = this.position.get(i) + newVelocity;
+            newVelocity = selfConfidence*this.velocity.get(i) + this.maxConfidence*mt.nextDouble()*(this.bestPosition.get(i)-this.position.get(i)) +
+                    this.maxConfidence*mt.nextDouble()*(this.bestInformantPosition.get(i)-this.position.get(i));
+            newPosition = this.position.get(i) + newVelocity;
             //Check and confine particle if needed
-            if (newVelocity < this.swarm.getMinPositions().get(i)) {
-               this.velocity.set(i,0d);
+            if (newPosition < this.swarm.getMinPositions().get(i)) {
+               //this.velocity.set(i,0d);
+               newVelocity = -newVelocity*0.5;
                newPosition = swarm.getMinPositions().get(i);
             }else{
-                if (newVelocity > this.swarm.getMaxPositions().get(i)) {
-                    this.velocity.set(i,0d);
+                if (newPosition > this.swarm.getMaxPositions().get(i)) {
+                    //this.velocity.set(i,0d);
+                    newVelocity = -newVelocity*0.5;
                     newPosition = swarm.getMaxPositions().get(i);
                 }
             }
@@ -187,16 +191,16 @@ public abstract class AbstractParticle {
     private void selectInformants() {
         int max = swarm.getParticles().size();
         int informantIndex;
-        ArrayList<Integer> pIndexes = new ArrayList<Integer>(this.informants.size());
-       MersenneTwisterFast mt = Utils.getMTInstance();
+        //ArrayList<Integer> pIndexes = new ArrayList<Integer>(this.informants.size());
+        MersenneTwisterFast mt = Utils.getMTInstance();
         this.informants.clear();
         int i = 0;
-        while (i < this.informants.size()) {
+        while (i < this.numberOfInformants) {
             informantIndex = mt.nextInt(max);
-            if (!pIndexes.contains(informantIndex)) {
+            //if (!pIndexes.contains(informantIndex)) {
                 this.informants.add(swarm.getParticles().get(informantIndex));
                 i++;
-            }
+            //}
         }
     }
 
