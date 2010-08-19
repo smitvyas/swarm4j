@@ -42,6 +42,7 @@ public class Swarm {
     private int informantsPerParticle;
     private double optimizedValue;
     private List<Double> optimizedPosition;
+    private final double phi;
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,id=DCE.14599890-4F8B-FE20-2986-2A53335432BC]
@@ -53,8 +54,18 @@ public class Swarm {
         this.minPositions = minPositions;
         this.informantsPerParticle = informantsPerParticle;
         this.init(numberOfParticles,dimensions, functionClassName);
+        phi = 0;
     }
 
+    public Swarm(int numberOfParticles, int minimize, int dimensions, List<Double> maxPositions,
+            List<Double> minPositions, int informantsPerParticle, String functionClassName, double phi) {
+        this.phi = phi;
+        this.minimize = minimize == Swarm.MINIMIZE;
+        this.maxPositions = maxPositions;
+        this.minPositions = minPositions;
+        this.informantsPerParticle = informantsPerParticle;
+        this.init(numberOfParticles,dimensions, functionClassName);
+    }
     public void init(int numberOfParticles, int dimensions, String functionClassName) {
         this.particles = new ArrayList<AbstractParticle>(numberOfParticles);
         MersenneTwisterFast mt = Utils.getMTInstance();
@@ -63,7 +74,11 @@ public class Swarm {
         if (this.minimize) {
             this.optimizedValue = Double.POSITIVE_INFINITY;
             for (int i = 0; i < numberOfParticles; i++) {
-                MinimizerParticle p = new MinimizerParticle(this,(ICostFunction)Utils.getInstanceByReflection(functionClassName),dimensions,this.informantsPerParticle);
+                MinimizerParticle p = null;
+                if (this.phi == 0)
+                    p = new MinimizerParticle(this,(ICostFunction)Utils.getInstanceByReflection(functionClassName),dimensions,this.informantsPerParticle);
+                else
+                    p = new MinimizerParticle(this,(ICostFunction)Utils.getInstanceByReflection(functionClassName),dimensions,this.informantsPerParticle,this.phi);
                 List<Double> tempPosition = new ArrayList<Double>(dimensions);
                 List<Double> tempVelocity = new ArrayList<Double>(dimensions);
                 for (int j = 0; j < dimensions; j++) {
@@ -101,7 +116,8 @@ public class Swarm {
     
     public List<Double> getOptimizedPosition() {
         //Double value  = this.particles.get(0).getOptimizedResult();
-        List<Double> position = this.particles.get(0).getBestPosition();
+        List<Double> position = null;
+        //= (this.optimizedPosition == null)?this.particles.get(0).getBestPosition():this.optimizedPosition;
         if (this.minimize) {
             for (AbstractParticle p : this.particles) {
                 if (p.getOptimizedResult() < this.optimizedValue) {
@@ -117,9 +133,14 @@ public class Swarm {
                 }
             }
         }
-        System.out.println(this.optimizedValue);
-        System.out.println(position);
-        return position;
+        //System.out.println(this.optimizedValue);
+        //System.out.println(position);
+        if (position != null) {
+            this.optimizedPosition = position;
+            return position;
+        }
+            
+        return this.optimizedPosition;
     }
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
@@ -179,6 +200,11 @@ public class Swarm {
             sb.append(p.getPosition());
             sb.append(System.getProperty("line.separator"));
         }
+        sb.append("Best Value Overall and Position: ");
+        sb.append(this.optimizedValue);
+        sb.append(this.getOptimizedPosition());
+        sb.append(System.getProperty("line.separator"));
+        sb.append(System.getProperty("line.separator"));
         return sb.toString();
     }
 

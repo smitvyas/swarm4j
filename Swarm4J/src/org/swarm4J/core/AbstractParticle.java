@@ -80,6 +80,18 @@ public abstract class AbstractParticle {
         //this.optimizedResult = Double.NaN;
 
     }
+    public AbstractParticle(Swarm swarm, ICostFunction costFunction, int dimensions, int numberOfInformants, double phi) {
+        this.selfConfidence = 1/(phi-1+Math.sqrt(phi*phi -2*phi));
+        this.maxConfidence = phi*this.selfConfidence;
+        this.swarm = swarm;
+        this.costFunction = costFunction;
+        this.dimensions = dimensions;
+        this.position = new ArrayList<Double>(dimensions);
+        this.velocity = new ArrayList<Double>(dimensions);
+        this.bestPosition = new ArrayList<Double>(dimensions);
+        this.informants = new ArrayList<AbstractParticle>(numberOfInformants);
+        this.numberOfInformants = numberOfInformants;
+    }
 
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,regenBody=yes,id=DCE.797F293A-4D17-F945-2561-66AAF6D69CB1]

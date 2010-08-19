@@ -19,6 +19,10 @@ public class MinimizerParticle extends AbstractParticle{
         this.optimizedResult = Double.POSITIVE_INFINITY;
     }
 
+     public MinimizerParticle(Swarm swarm, ICostFunction costFunction, int dimensions,int numberOfInformants, double phi) {
+        super(swarm,costFunction,dimensions,numberOfInformants, phi);
+        this.optimizedResult = Double.POSITIVE_INFINITY;
+    }
     @Override
     public void evaluatePosition() throws Exception {
         double r = this.costFunction.evaluate(this.position);
