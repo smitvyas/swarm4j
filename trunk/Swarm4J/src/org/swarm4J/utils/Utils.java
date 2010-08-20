@@ -4,6 +4,8 @@
  */
 package org.swarm4J.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,5 +35,13 @@ public class Utils {
             Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         }
         return o;
+    }
+
+    public static List<Double> doubleListDeepCopy(List<Double> original) {
+        List<Double> copy = new ArrayList<Double>();
+        for (int i=0; i<original.size();i++) {
+            copy.add(original.get(i).doubleValue());
+        }
+        return copy;
     }
 }
