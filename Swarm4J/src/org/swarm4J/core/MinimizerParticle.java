@@ -27,8 +27,12 @@ public class MinimizerParticle extends AbstractParticle{
     public void evaluatePosition() throws Exception {
         double r = this.costFunction.evaluate(this.position);
         this.result = r;
-        if (r < this.optimizedResult ) {
-            this.bestPosition = this.position;
+        if (r < this.optimizedResult) {
+            this.bestPosition.clear();
+            for (Double v : this.position){
+                this.bestPosition.add(v.doubleValue());
+            }
+            //this.bestPosition = this.position;
             this.optimizedResult = r;
         }
     }

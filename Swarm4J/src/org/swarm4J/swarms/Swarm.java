@@ -89,7 +89,7 @@ public class Swarm {
                     tempVelocity.add(vel);
                 }
                 p.setPosition(tempPosition);
-                p.setBestPosition(tempPosition);
+                p.setBestPosition(Utils.doubleListDeepCopy(tempPosition));
                 p.setVelocity(tempVelocity);
                 try {
                     p.evaluatePosition();
@@ -116,26 +116,43 @@ public class Swarm {
     
     public List<Double> getOptimizedPosition() {
         //Double value  = this.particles.get(0).getOptimizedResult();
-        List<Double> position = null;
+        final List<Double> position = new ArrayList<Double>();
+        double x = 0;
+        double y = 0;
+        //Double[] position = null;
         //= (this.optimizedPosition == null)?this.particles.get(0).getBestPosition():this.optimizedPosition;
         if (this.minimize) {
             for (AbstractParticle p : this.particles) {
                 if (p.getOptimizedResult() < this.optimizedValue) {
                     this.optimizedValue = p.getOptimizedResult();
-                    position = p.getBestPosition();
+                    position.clear();
+                    System.out.println("cambio");
+                    //position = p.getBestPosition().toArray(new Double[p.getBestPosition().size()]);
+                    //position = new ArrayList<Double>();
+                    for (Double v : p.getBestPosition()) {
+                        String temp = v.toString();
+                        position.add(Double.parseDouble(temp));
+                    }
+                    //position = p.getBestPosition().;
                 }
             }
         }else{
             for (AbstractParticle p : this.particles) {
                 if (p.getOptimizedResult() > this.optimizedValue) {
                     this.optimizedValue = p.getOptimizedResult();
-                    position = p.getBestPosition();
+                    //position = p.getBestPosition();
                 }
             }
         }
         //System.out.println(this.optimizedValue);
         //System.out.println(position);
         if (position != null) {
+            /*positionList = new ArrayList<Double>();
+            for (Double d : position) {
+            positionList.add(d);
+            }*/
+            //position.add(x);
+            //position.add(y);
             this.optimizedPosition = position;
             return position;
         }
@@ -200,9 +217,11 @@ public class Swarm {
             sb.append(p.getPosition());
             sb.append(System.getProperty("line.separator"));
         }
-        sb.append("Best Value Overall and Position: ");
-        sb.append(this.optimizedValue);
+        sb.append("Best Position Overall: ");
         sb.append(this.getOptimizedPosition());
+        sb.append(System.getProperty("line.separator"));
+        sb.append("Best Value Overall: ");
+        sb.append(this.optimizedValue);
         sb.append(System.getProperty("line.separator"));
         sb.append(System.getProperty("line.separator"));
         return sb.toString();
