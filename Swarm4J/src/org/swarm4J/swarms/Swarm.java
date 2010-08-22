@@ -117,18 +117,11 @@ public class Swarm {
     public List<Double> getOptimizedPosition() {
         //Double value  = this.particles.get(0).getOptimizedResult();
         final List<Double> position = new ArrayList<Double>();
-        double x = 0;
-        double y = 0;
-        //Double[] position = null;
-        //= (this.optimizedPosition == null)?this.particles.get(0).getBestPosition():this.optimizedPosition;
         if (this.minimize) {
             for (AbstractParticle p : this.particles) {
                 if (p.getOptimizedResult() < this.optimizedValue) {
                     this.optimizedValue = p.getOptimizedResult();
                     position.clear();
-                    System.out.println("cambio");
-                    //position = p.getBestPosition().toArray(new Double[p.getBestPosition().size()]);
-                    //position = new ArrayList<Double>();
                     for (Double v : p.getBestPosition()) {
                         String temp = v.toString();
                         position.add(Double.parseDouble(temp));
@@ -144,15 +137,9 @@ public class Swarm {
                 }
             }
         }
-        //System.out.println(this.optimizedValue);
-        //System.out.println(position);
-        if (position != null) {
-            /*positionList = new ArrayList<Double>();
-            for (Double d : position) {
-            positionList.add(d);
-            }*/
-            //position.add(x);
-            //position.add(y);
+        
+        if (!position.isEmpty()) {
+            
             this.optimizedPosition = position;
             return position;
         }
