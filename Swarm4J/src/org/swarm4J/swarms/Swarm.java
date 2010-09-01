@@ -146,7 +146,30 @@ public class Swarm {
             
         return this.optimizedPosition;
     }
+    public boolean testForConvergence(){
+        double dispersion = 0.00001;
+        boolean[] convergence = new boolean[this.maxPositions.size()];
+        for(int i = 0; i < this.maxPositions.size();i++) {
+            double sd = 0;
+            double sc = 0;
+            double s = 0;
+            for (AbstractParticle p : this.particles) {
+                sc += Math.pow(p.getPosition().get(i),2);
+                s += p.getPosition().get(i);
+            }
+            sd = (sc/this.particles.size()) + Math.pow(s/this.particles.size(),2);
+            if (sd < dispersion)
+                convergence[i] = true;
+            else
+                convergence[i] = false;
 
+        }
+        for(boolean c : convergence) {
+            if (!c)
+                return false;
+        }
+        return true;
+    }
     // <editor-fold defaultstate="collapsed" desc=" UML Marker "> 
     // #[regen=yes,regenBody=yes,id=DCE.18765E00-B114-DB31-67EF-4882A8F6745C]
     // </editor-fold> 
