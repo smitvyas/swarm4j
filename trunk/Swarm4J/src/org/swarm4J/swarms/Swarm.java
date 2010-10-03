@@ -82,7 +82,7 @@ public class Swarm {
                 List<Double> tempPosition = new ArrayList<Double>(dimensions);
                 List<Double> tempVelocity = new ArrayList<Double>(dimensions);
                 for (int j = 0; j < dimensions; j++) {
-                    pos = this.minPositions.get(j) + (mt.nextDouble() * ((this.maxPositions.get(j) - this.minPositions.get(j)) + 1));
+                    pos = this.minPositions.get(j) + (mt.nextDouble() * ((this.maxPositions.get(j) - this.minPositions.get(j))));
                     vel = (this.minPositions.get(j) - this.maxPositions.get(j))/2  + (mt.nextDouble() * (((this.maxPositions.get(j)
                             - this.minPositions.get(j))/2 - (this.minPositions.get(j) - this.maxPositions.get(j))/2) + 1));
                     tempPosition.add(pos);
@@ -213,6 +213,10 @@ public class Swarm {
     // </editor-fold> 
     public List<AbstractParticle> getParticles () {
         return particles;
+    }
+
+    public double getOptimizedValue() {
+        return optimizedValue;
     }
 
     @Override
