@@ -1,0 +1,1 @@
+This is an general purpose implementation of basic PSO in Java. Also, in the future this project will implement TRIBES, a parameter-free PSO version.
